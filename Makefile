@@ -7,6 +7,7 @@
 #
 
 DESTDIR ?= "$(CURDIR)/.output"
+CONFIG_PREFIX ?= "CONFIG_"
 
 pkg := $(shell ls import/*.tar.xz | sort -r | head -n 1)
 pkg-pfx := $(notdir $(patsubst %.tar.xz,%,$(pkg)))
@@ -49,7 +50,7 @@ $(stamp):
 	@mkdir -vp $(stage-dir)
 	$(tar-cmd) $(pkg) -C $(stage-dir)
 	@test -d $(stage-dir)/$(pkg-pfx)
-	@cd $(stage-dir)/$(pkg-pfx) && ./configure --prefix=$(DESTDIR)
+	@cd $(stage-dir)/$(pkg-pfx) && ./configure --prefix=$(DESTDIR) --disable-nconf --disable-qconf --disable-gconf --enable-config-prefix=$(CONFIG_PREFIX) --disable-wall --disable-shared
 	@touch $(stamp)
 
 .PHONY: clean
