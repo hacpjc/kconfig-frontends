@@ -3,11 +3,11 @@
 #
 
 #
-# Command (Use default CC): make DESTDIR="/tmp"
+# Command (Use default CC): make MY_OUTPUT="/tmp" MY_PREFIX="CONFIG_"
 #
 
-DESTDIR ?= "$(CURDIR)/.output"
-CONFIG_PREFIX ?= "CONFIG_"
+MY_OUTPUT ?= "$(CURDIR)/.output"
+MY_PREFIX ?= "CONFIG_"
 
 pkg := $(shell ls import/*.tar.xz | sort -r | head -n 1)
 pkg-pfx := $(notdir $(patsubst %.tar.xz,%,$(pkg)))
@@ -34,7 +34,7 @@ msg:
 	@echo "...pkg: $(pkg)"
 	@echo "...pkg-pfx: $(pkg-pfx)"
 	@echo "...stage-dir: $(stage-dir)"
-	@echo "...DESTDIR: $(DESTDIR)"
+	@echo "...MY_OUTPUT: $(MY_OUTPUT)"
 
 .PHONY: verify_depend
 verify_depend:
@@ -50,7 +50,7 @@ $(stamp):
 	@mkdir -vp $(stage-dir)
 	$(tar-cmd) $(pkg) -C $(stage-dir)
 	@test -d $(stage-dir)/$(pkg-pfx)
-	@cd $(stage-dir)/$(pkg-pfx) && ./configure --prefix=$(DESTDIR) --disable-nconf --disable-qconf --disable-gconf --enable-config-prefix=$(CONFIG_PREFIX) --disable-wall --disable-shared
+	@cd $(stage-dir)/$(pkg-pfx) && ./configure --prefix=/usr --disable-nconf --disable-qconf --disable-gconf --enable-config-prefix=$(MY_PREFIX) --disable-wall --disable-shared
 	@touch $(stamp)
 
 .PHONY: clean
@@ -63,6 +63,6 @@ distclean: clean
 .PHONY: install
 install:
 	@test -d $(stage-dir)/$(pkg-pfx)
-	@$(MAKE) -C $(stage-dir)/$(pkg-pfx) install
+	@DESTDIR=$(MY_OUTPUT) $(MAKE) -C $(stage-dir)/$(pkg-pfx) install
 
 #;
